@@ -114,6 +114,28 @@ class Size(object):
         return size
 
 
+class Event(object):
+    def __init__(self, id, action_status, droplet_id, event_type_id, percentage):
+        self.id = id
+        self.action_status = action_status
+        self.droplet_id = droplet_id
+        self.event_type_id = event_type_id
+        self.percentage = percentage
+
+    def to_json(self):
+        return self.__dict__
+
+    @staticmethod
+    def from_json(json):
+        id = json.get('id', -1)
+        action_status = json.get('action_status', '')
+        droplet_id = json.get('droplet_id', -1)
+        event_type_id = json.get('event_type_id', -1)
+        percentage = json.get('percentage', '')
+        event = Event(id, action_status, droplet_id, event_type_id, percentage)
+        return event
+
+
 class SSHKey(object):
     def __init__(self, id, name):
         self.id = id
@@ -204,7 +226,7 @@ class Client(object):
             params['ssh_key_ids'] = ','.join(ssh_key_ids)
         if virtio:
             params['virtio'] = 1
-        
+
         json = self.request('/droplets/new', method='GET', params=params)
         droplet_json = json.get('droplet', None)
         droplet = Droplet.from_json(droplet_json)
@@ -311,6 +333,14 @@ class Client(object):
         event = json.get('event', None)
         return event
 
+    def show_event(self, event_id):
+        params = {}
+        json = self.request('/events/%s' % (event_id), method='GET',
+            params=params)
+        event_json = json.get('event', None)
+        event = Event.from_json(event_json)
+        return event
+
     def show_ssh_key(self, id):
         params = {}
         json = self.request('/ssh_keys/%s' % (id), method='GET', params=params)
@@ -372,7 +402,7 @@ class Client(object):
             else:
                 raise DOPException('Empty json!')
         else:
-            error = ('Status code: %d, full response: %s' % 
+            error = ('Status code: %d, full response: %s' %
                     (response.status_code, response.json()))
             raise DOPException(error)
         return json
