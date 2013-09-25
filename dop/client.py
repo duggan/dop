@@ -223,7 +223,7 @@ class Client(object):
             'region_id': region_id,
         }
         if ssh_key_ids:
-            params['ssh_key_ids'] = ','.join(ssh_key_ids)
+            params['ssh_key_ids'] = ','.join([str(k) for k in ssh_key_ids])
         if virtio:
             params['virtio'] = 1
 
