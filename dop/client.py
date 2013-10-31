@@ -288,6 +288,14 @@ class Client(object):
             method='POST', params=params)
         return json.get('event_id', None)
 
+    def rename_droplet(self, id, name):
+        params = {
+            'name': name,
+        }
+        json = self.request('/droplets/%s/rename' % (id), method='GET',
+            params=params)
+        return json.get('event_id', None)
+
     def destroy_droplet(self, id):
         params = {}
         json = self.request('/droplets/%s/destroy' % (id), method='GET',
