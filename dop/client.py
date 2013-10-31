@@ -137,9 +137,10 @@ class Event(object):
 
 
 class SSHKey(object):
-    def __init__(self, id, name):
+    def __init__(self, id, name, ssh_pub_key):
         self.id = id
         self.name = name
+        self.ssh_pub_key = ssh_pub_key
 
     def to_json(self):
         return self.__dict__
@@ -148,7 +149,8 @@ class SSHKey(object):
     def from_json(json):
         id = json.get('id', -1)
         name = json.get('name', '')
-        ssh_key = SSHKey(id, name)
+        ssh_pub_key = json.get('ssh_pub_key', '')
+        ssh_key = SSHKey(id, name, ssh_pub_key)
         return ssh_key
 
 
@@ -352,10 +354,12 @@ class Client(object):
         ssh_key = SSHKey.from_json(json)
         return ssh_key
 
-    # EXPERIMENTAL: ssh actions #
-    def add_ssh_key(self, id):
-        params = {}
-        json = self.request('/ssh_key/%s/add' % (id), method='GET',
+    def add_ssh_key(self, name="", ssh_pub_key=""):
+        params = {
+            'name': name,
+            'ssh_pub_key': ssh_pub_key
+        }
+        json = self.request('/ssh_keys/new', method='GET',
             params=params)
         ssh_key_json = json.get('ssh_key', None)
         ssh_key = SSHKey.from_json(ssh_key_json)
