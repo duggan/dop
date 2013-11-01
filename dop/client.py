@@ -373,11 +373,14 @@ class Client(object):
         ssh_key = SSHKey.from_json(ssh_key_json)
         return ssh_key
 
-    def edit_ssh_key(self, id):
-        params = {}
+    def edit_ssh_key(self, id, ssh_pub_key=""):
+        params = {
+            'ssh_pub_key': ssh_pub_key
+        }
         json = self.request('/ssh_key/%s/edit' % (id), method='GET',
             params=params)
-        ssh_key = SSHKey.from_json(json)
+        ssh_key_json = json.get('ssh_key', None)
+        ssh_key = SSHKey.from_json(ssh_key_json)
         return ssh_key
 
     def request(self, target, method='GET', params={}):
